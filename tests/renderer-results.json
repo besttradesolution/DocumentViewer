@@ -1,0 +1,70 @@
+[
+  {
+    "file": "sample.pdf",
+    "result": "PASS",
+    "errors": []
+  },
+  {
+    "file": "locked.pdf",
+    "result": "PASS",
+    "errors": []
+  },
+  {
+    "file": "cjk.pdf",
+    "result": "PASS",
+    "errors": []
+  },
+  {
+    "file": "sample.docx",
+    "result": "PASS",
+    "errors": []
+  },
+  {
+    "file": "multipage.docx",
+    "result": "PASS",
+    "errors": []
+  },
+  {
+    "file": "lists.docx",
+    "result": "PASS",
+    "errors": []
+  },
+  {
+    "file": "sample.xlsx",
+    "result": "PASS",
+    "errors": []
+  },
+  {
+    "file": "merges.xlsx",
+    "result": "PASS",
+    "errors": []
+  },
+  {
+    "file": "styled.xlsx",
+    "result": "PASS",
+    "errors": []
+  },
+  {
+    "file": "sample.pptx",
+    "result": "PASS",
+    "errors": []
+  },
+  {
+    "file": "effects.pptx",
+    "result": "UNSUPPORTED",
+    "check": "Known PPTXjs effects fixture failure is reported clearly",
+    "errors": [
+      "Cannot read properties of undefined (reading 'target')"
+    ]
+  },
+  {
+    "file": "corrupted.pdf",
+    "result": "PASS",
+    "check": "Malformed PDF rejected"
+  },
+  {
+    "file": "notes-報告.txt",
+    "result": "PASS",
+    "errors": []
+  }
+]
