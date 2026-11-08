@@ -1,0 +1,42 @@
+[
+  {
+    "mode": "modern CSS",
+    "fixture": "sample.pdf",
+    "result": "PASS",
+    "pageWidth": 319,
+    "pageHeight": 414,
+    "canvasWidth": 319,
+    "canvasHeight": 414,
+    "inlineHeight": "round(down, var(--total-scale-factor) * 792px, var(--scale-round-y))"
+  },
+  {
+    "mode": "modern CSS",
+    "fixture": "layout-rotations.pdf",
+    "result": "PASS",
+    "pageWidth": 319,
+    "pageHeight": 414,
+    "canvasWidth": 319,
+    "canvasHeight": 414,
+    "inlineHeight": "round(down, var(--total-scale-factor) * 792px, var(--scale-round-y))"
+  },
+  {
+    "mode": "legacy CSS round unavailable",
+    "fixture": "sample.pdf",
+    "result": "PASS",
+    "pageWidth": 320,
+    "pageHeight": 414.109375,
+    "canvasWidth": 320,
+    "canvasHeight": 414.109375,
+    "inlineHeight": "calc(var(--total-scale-factor) * 792px)"
+  },
+  {
+    "mode": "legacy CSS round unavailable",
+    "fixture": "layout-rotations.pdf",
+    "result": "PASS",
+    "pageWidth": 320,
+    "pageHeight": 414.109375,
+    "canvasWidth": 320,
+    "canvasHeight": 414.109375,
+    "inlineHeight": "calc(var(--total-scale-factor) * 792px)"
+  }
+]

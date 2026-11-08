@@ -123,7 +123,7 @@ class MainActivity: ComponentActivity() {
                     HorizontalDivider(color=colors.outlineVariant)
                     TextButton(onClick={scope.launch {store.clear()}}) {ReaderIcon("trash",modifier=Modifier.size(18.dp));Spacer(Modifier.width(10.dp));Text("Clear recent documents")}
                     Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {ReaderIcon("shield",tint=colors.primary);Column {Text("Your files stay with you",fontSize=13.sp,fontWeight=FontWeight.Medium);Text("Offline. No accounts. No tracking.",fontSize=11.sp,color=colors.onSurfaceVariant)}}
-                    Text("Document Viewer 0.2.0 · 50 MB file limit\nPowerPoint preview is experimental.",fontSize=10.sp,lineHeight=16.sp,color=colors.onSurfaceVariant)
+                    Text("Document Viewer 0.2.1 · 50 MB file limit\nPowerPoint preview is experimental.",fontSize=10.sp,lineHeight=16.sp,color=colors.onSurfaceVariant)
                 }
             }
         }

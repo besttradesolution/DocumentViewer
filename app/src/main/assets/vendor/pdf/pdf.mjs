@@ -7835,8 +7835,14 @@ function setLayerDimensions(div, viewport, mustFlip = false, mustRotate = true) 
     const {
       style
     } = div;
-    const widthStr = `round(down, var(--total-scale-factor) * ${pageWidth}px, var(--scale-round-x))`,
-      heightStr = `round(down, var(--total-scale-factor) * ${pageHeight}px, var(--scale-round-y))`;
+    // Android compatibility: PDF.js 6 assumes CSS round() support. Older WebViews
+    // accept the var()-containing declaration but compute auto/zero page height.
+    // Keep dynamic scale variables, rotation and UserUnit intact with calc().
+    const useRound = globalThis.CSS?.supports?.("width", "round(down, 1px, 1px)") === true;
+    const w = `var(--total-scale-factor) * ${pageWidth}px`,
+      h = `var(--total-scale-factor) * ${pageHeight}px`;
+    const widthStr = useRound ? `round(down, ${w}, var(--scale-round-x))` : `calc(${w})`,
+      heightStr = useRound ? `round(down, ${h}, var(--scale-round-y))` : `calc(${h})`;
     if (!mustFlip || viewport.rotation % 180 === 0) {
       style.width = widthStr;
       style.height = heightStr;

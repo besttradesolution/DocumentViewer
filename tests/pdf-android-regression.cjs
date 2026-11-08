@@ -33,6 +33,7 @@ const mime={'.js':'application/javascript','.mjs':'application/javascript','.was
      for(let i=0;i<data.length;i+=4)if(data[i+3]>0&&Math.min(data[i],data[i+1],data[i+2])<220)ink++;
      return ink;
     });assert(pixels>50,'PDF must contain rendered content, not merely an empty canvas');
+    const box=await page.locator('.page canvas').first().boundingBox();assert(box&&box.height>300,'The displayed canvas must not collapse to a horizontal strip');
     await page.evaluate(()=>window.documentViewerFind('Paperwren'));
     await page.waitForFunction(()=>document.querySelectorAll('.textLayer .highlight').length>0);
     await page.setViewportSize({width:780,height:360});

@@ -31,8 +31,8 @@
   },
   {
     "path": "vendor/pdf/pdf.mjs",
-    "bytes": 1098939,
-    "sha256": "2792b7c390ad6d5f4245d326b70deebbc990fa4bcac691412f6df886abb9e867"
+    "bytes": 1099368,
+    "sha256": "8a11c8269bbf4cdb3a4fd2554557a3c6983c3e8b50f79ad0b4445c747cbff8ee"
   },
   {
     "path": "vendor/pdf/pdf.worker.mjs",

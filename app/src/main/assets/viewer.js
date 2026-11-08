@@ -26,7 +26,14 @@ async function pdf(){
    $('password').onclose=()=>{if($('password').returnValue==='open')update($('passwordValue').value); else {task.destroy();fail(new Error('Password entry cancelled.'));}};
  };
  eventBus.on('pagesinit',()=>{viewer.currentScaleValue='page-width';status.textContent='Rendering your document…';});
- eventBus.on('pagerendered',e=>{if(e.error)fail(e.error);else {status.textContent='';document.documentElement.dataset.pdfRendered='true';}});
+ eventBus.on('pagerendered',e=>{
+  if(e.error){fail(e.error);return;}
+  // A painted bitmap alone doesn't mean the reader can display it: unsupported
+  // CSS dimensions can collapse the page and its canvas to a horizontal strip.
+  const bounds=e.source?.div?.getBoundingClientRect();
+  if(bounds&&(bounds.width<2||bounds.height<2)){fail(new Error('The page layout is unavailable. Update Android System WebView and reopen this document.'));return;}
+  status.textContent='';document.documentElement.dataset.pdfRendered='true';
+ });
  eventBus.on('pagechanging',e=>{$('page').value=e.pageNumber;});
  const doc=await task.promise; linkService.setDocument(doc);findController.setDocument(doc);viewer.setDocument(doc);
  $('count').textContent='/ '+doc.numPages;$('page').max=doc.numPages;

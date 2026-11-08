@@ -21,6 +21,10 @@ Full license texts are bundled in `app/src/main/assets/licenses/` and included i
 
 Sources: https://github.com/mozilla/pdf.js , https://github.com/VolodymyrBaydalka/docxjs , https://github.com/Stuk/jszip , https://github.com/cure53/DOMPurify , https://docs.sheetjs.com/ , https://github.com/meshesha/PPTXjs , https://github.com/jquery/jquery , https://github.com/d3/d3 , https://github.com/novus/nvd3 , https://github.com/bgrins/filereader.js , https://github.com/Razee4315/Paperwren .
 
+## Local PDF.js compatibility change (0.2.1)
+
+`vendor/pdf/pdf.mjs`, `setLayerDimensions`: restores feature detection and a CSS `calc()` fallback for WebViews without CSS `round()`, following the implementation in upstream PDF.js 5.7.284. This preserves dynamic scaling, page rotation and UserUnit behavior without downgrading the PDF engine or worker. All original Apache-2.0 notices remain intact. Upstream reference: https://github.com/mozilla/pdf.js/blob/v5.7.284/src/display/display_utils.js .
+
 ## Local PPTXjs hardening changes
 
 `vendor/pptx/pptxjs.js` differs from upstream only in its slide insertion and generated stylesheet insertion: slide HTML is passed through DOMPurify before jQuery insertion; stylesheet content uses a style element's textContent. The host supplies a modern jQuery rather than the upstream 1.11.3 copy, disables media, disables global script evaluation and runs the renderer in an opaque-origin sandbox iframe with CSP. These changes do not constitute a full security audit of the old engine. No pptx-preview code is distributed.

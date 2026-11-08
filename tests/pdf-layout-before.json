@@ -1,0 +1,11 @@
+[
+  {
+    "mode": "legacy CSS round unavailable",
+    "result": "REPRODUCED",
+    "pageWidth": 360,
+    "pageHeight": 0,
+    "canvasWidth": 360,
+    "canvasHeight": 0,
+    "inlineHeight": "var(--unavailable-css-round)"
+  }
+]
