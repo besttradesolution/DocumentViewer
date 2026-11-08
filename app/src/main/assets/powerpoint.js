@@ -1,8 +1,10 @@
 let started=false;
+document.documentElement.dataset.theme=new URLSearchParams(location.search).get('theme')==='dark'?'dark':'light';
 function renderFailure(){document.getElementById('slides').replaceChildren();document.getElementById('status').textContent='Unable to render this presentation. It may use unsupported features or be corrupted.';}
 window.addEventListener('error',renderFailure);
 window.addEventListener('unhandledrejection',renderFailure);
 window.addEventListener('message',async event=>{
+ if(event.source===parent&&['dark','light'].includes(event.data?.appearance)){document.documentElement.dataset.theme=event.data.appearance;return;}
  if(started||event.source!==parent||!/^https:\/\/appassets\.androidplatform\.net\/document\/[a-zA-Z0-9-]+$/.test(event.data?.documentUrl||''))return;started=true;
  const status=document.getElementById('status');
  try {

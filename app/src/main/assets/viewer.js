@@ -1,7 +1,8 @@
 const $=id=>document.getElementById(id), params=new URLSearchParams(location.search), type=params.get('type'), url=params.get('doc');
+document.documentElement.dataset.theme=params.get('theme')==='dark'?'dark':'light';
 const status=$('status'), content=$('content');
 const cleanOptions={ADD_TAGS:['style'],ADD_ATTR:['style'],FORBID_TAGS:['script','iframe','object','embed','form','input','video','audio','link','meta'],FORBID_ATTR:['srcset'],ALLOW_DATA_ATTR:false};
-function fail(e){$('pdfContainer').hidden=true;content.hidden=false;status.textContent='Unable to display this document. '+(e?.message||'It may be corrupted, encrypted or unsupported.');}
+function fail(e){$('pdfContainer').hidden=true;content.hidden=false;status.dataset.state='error';status.textContent='Unable to display this document. '+(e?.message||'It may be corrupted, encrypted or unsupported.');}
 function clean(node){
  const fragment=DOMPurify.sanitize(node,{...cleanOptions,RETURN_DOM_FRAGMENT:true});
  fragment.querySelectorAll('[href],[src],[xlink\\:href]').forEach(el=>{for(const attr of ['href','src','xlink:href']) { const v=el.getAttribute(attr); if(v && !/^(data:image\/(png|jpeg|gif|webp);|blob:|#)/i.test(v)) el.removeAttribute(attr); }});
@@ -9,7 +10,7 @@ function clean(node){
 }
 function controls(visible){for(const el of $('controls').children)el.hidden=!visible.includes(el.id);}
 async function pdf(){
- controls(['previous','page','count','next','fit','zoomout','zoomin','find','findnext']);
+ controls(['previous','page','count','next','fit','zoomout','zoomin','searchtoggle']);
  const lib=await import('./vendor/pdf/pdf.mjs'); globalThis.pdfjsLib=lib;
  lib.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdf/pdf.worker.mjs',location.href).href;
  const {EventBus,PDFLinkService,PDFFindController,PDFViewer}=await import('./vendor/pdf/pdf_viewer.mjs');
@@ -17,22 +18,28 @@ async function pdf(){
  $('pdfContainer').hidden=false; content.hidden=true;
  const viewer=new PDFViewer({container:$('pdfContainer'),viewer:$('pdfViewer'),eventBus,linkService,findController,annotationMode:0,maxCanvasPixels:4096*4096});
  linkService.setViewer(viewer);
- const task=lib.getDocument({url,cMapUrl:new URL('./vendor/pdf/cmaps/',location.href).href,cMapPacked:true,standardFontDataUrl:new URL('./vendor/pdf/standard_fonts/',location.href).href,wasmUrl:new URL('./vendor/pdf/wasm/',location.href).href,isEvalSupported:false,enableXfa:false});
+ // The bounded private snapshot doesn't implement HTTP range requests.
+ const task=lib.getDocument({url,disableRange:true,disableStream:true,cMapUrl:new URL('./vendor/pdf/cmaps/',location.href).href,cMapPacked:true,standardFontDataUrl:new URL('./vendor/pdf/standard_fonts/',location.href).href,wasmUrl:new URL('./vendor/pdf/wasm/',location.href).href,isEvalSupported:false,enableXfa:false});
  task.onPassword=(update,reason)=>{
    status.textContent=reason===2?'Incorrect password. Please try again.':'';
    $('passwordValue').value=''; $('password').showModal();
    $('password').onclose=()=>{if($('password').returnValue==='open')update($('passwordValue').value); else {task.destroy();fail(new Error('Password entry cancelled.'));}};
  };
- const doc=await task.promise; viewer.setDocument(doc);linkService.setDocument(doc);findController.setDocument(doc);
- $('count').textContent='/ '+doc.numPages;$('page').max=doc.numPages;
- eventBus.on('pagesinit',()=>{viewer.currentScaleValue='page-width';status.textContent='';});
+ eventBus.on('pagesinit',()=>{viewer.currentScaleValue='page-width';status.textContent='Rendering your document…';});
+ eventBus.on('pagerendered',e=>{if(e.error)fail(e.error);else {status.textContent='';document.documentElement.dataset.pdfRendered='true';}});
  eventBus.on('pagechanging',e=>{$('page').value=e.pageNumber;});
+ const doc=await task.promise; linkService.setDocument(doc);findController.setDocument(doc);viewer.setDocument(doc);
+ $('count').textContent='/ '+doc.numPages;$('page').max=doc.numPages;
  $('previous').onclick=()=>viewer.previousPage(); $('next').onclick=()=>viewer.nextPage();
  $('page').onchange=()=>{viewer.currentPageNumber=Math.max(1,Math.min(doc.numPages,Number($('page').value)||1));};
  $('fit').onclick=()=>viewer.currentScaleValue='page-width';
  $('zoomin').onclick=()=>viewer.currentScale=Math.min(5,viewer.currentScale*1.2);$('zoomout').onclick=()=>viewer.currentScale=Math.max(.2,viewer.currentScale/1.2);
  const find=again=>eventBus.dispatch('find',{source:window,type:again?'again':'',query:$('find').value,caseSensitive:false,entireWord:false,highlightAll:true,findPrevious:false});
  $('find').oninput=()=>find(false);$('findnext').onclick=()=>find(true);
+ $('searchtoggle').onclick=()=>{$('searchPanel').hidden=!$('searchPanel').hidden;if(!$('searchPanel').hidden)$('find').focus();};
+ window.documentViewerFind=(query,again=false)=>{$('find').value=query;find(again);};
+ new ResizeObserver(()=>{if(viewer.currentScaleValue==='page-width')viewer.currentScaleValue='page-width';}).observe($('pdfContainer'));
+ window.addEventListener('pagehide',()=>{viewer.setDocument(null);task.destroy();},{once:true});
 }
 async function word(bytes){
  controls(['fit','zoomout','zoomin']); const detached=document.createElement('div');
@@ -72,7 +79,7 @@ async function spreadsheet(bytes){
 }
 async function powerpoint(){
  controls([]);status.textContent='Experimental PowerPoint preview. Layout, fonts and charts may differ.';
- const frame=document.createElement('iframe');frame.sandbox='allow-scripts';frame.title='PowerPoint slides';frame.src='powerpoint.html';content.append(frame);
+ const frame=document.createElement('iframe');frame.sandbox='allow-scripts';frame.title='PowerPoint slides';frame.src='powerpoint.html?theme='+document.documentElement.dataset.theme;content.append(frame);
  frame.onload=()=>frame.contentWindow.postMessage({documentUrl:new URL(url,location.origin).href},'*');
 }
 try {

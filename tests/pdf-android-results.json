@@ -1,0 +1,18 @@
+[
+  {
+    "case": "Android module-mime response",
+    "result": "PASS",
+    "detail": "Rejected modules produce a visible error"
+  },
+  {
+    "case": "Android worker-mime response",
+    "result": "PASS",
+    "detail": "Rejected modules produce a visible error"
+  },
+  {
+    "case": "Android explicit module response",
+    "result": "PASS",
+    "paintedPixels": 3445,
+    "detail": "PDF paints visible pixels, search highlights, viewport resize succeeds"
+  }
+]

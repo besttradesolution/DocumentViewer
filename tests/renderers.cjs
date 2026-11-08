@@ -31,7 +31,7 @@ const types={'.js':'text/javascript','.mjs':'text/javascript','.css':'text/css',
     const frame=page.frameLocator('iframe');await frame.locator('.slide').first().waitFor({timeout:30000});assert((await frame.locator('.slide').count())>0);
     assert(!(await frame.locator('#status').innerText()).includes('Unable'));if(await frame.locator('.slide').count()>1){await frame.locator('#next').click();assert((await frame.locator('#position').innerText()).startsWith('2 /'));}
    }else await page.locator(selector).first().waitFor({timeout:30000});
-   if(type==='pdf'){await page.locator('#find').fill('document');await page.locator('#findnext').click();await page.locator('#zoomin').click();}
+   if(type==='pdf'){await page.waitForFunction(()=>document.documentElement.dataset.pdfRendered==='true');await page.locator('#searchtoggle').click();await page.locator('#find').fill('document');await page.locator('#findnext').click();await page.locator('#zoomin').click();}
    if(type==='xlsx')assert((await page.locator('table td').count())>0);
    if(type==='docx')assert((await page.locator('section.docx').first().innerText()).length>0);
    assert(await page.evaluate(()=>!DOMPurify.sanitize('<img src="x" onerror="alert(1)"><script>alert(2)</script>').includes('onerror')));
