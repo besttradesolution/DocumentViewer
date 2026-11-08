@@ -1,5 +1,7 @@
 # Document Viewer — Android
 
+PDFs now open in native Android **Page view**, which bypasses WebView layout. Use **Text & search** in the toolbar for PDF.js text selection, search or password entry. Native page view is image based; password-protected PDFs may require the alternate reader. Version 0.3.0 includes a manual **Android PDF device checks** workflow under GitHub Actions. See docs/UPDATE-0.3.0.md for verification and limits.
+
 An offline, read-only native Android document viewer. Kotlin, Compose Material 3, SAF and bundled local renderers. No INTERNET permission, ads, accounts, trackers or broad storage permission.
 
 This is a development build. PowerPoint support is experimental. See docs/ARCHITECTURE.md and docs/TEST_RESULTS.md for actual checks and limitations; do not interpret parsing support as complete Office fidelity.

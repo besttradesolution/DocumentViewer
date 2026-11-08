@@ -60,11 +60,13 @@ class MainActivity: ComponentActivity() {
         var loading by remember { mutableStateOf(false) }; var error by remember { mutableStateOf<String?>(null) }
         var settings by remember { mutableStateOf(false) }; var web by remember { mutableStateOf<WebView?>(null) }
         var search by remember { mutableStateOf(false) }; var query by remember { mutableStateOf("") }
+        var pdfTextMode by remember {mutableStateOf(false)}
+        fun switchPdfMode(textMode: Boolean) {web?.stopLoading();web?.destroy();web=null;search=false;query="";pdfTextMode=textMode}
         fun find(text: String, again: Boolean=false) {
             if(document?.type=="pdf") web?.evaluateJavascript("window.documentViewerFind && window.documentViewerFind(${JSONObject.quote(text)}, $again);",null)
             else if(again) web?.findNext(true) else web?.findAllAsync(text)
         }
-        fun close() { web?.stopLoading(); web?.destroy(); web=null; document?.file?.delete(); document=null; search=false; query=""; restoreUri=null }
+        fun close() { web?.stopLoading(); web?.destroy(); web=null; document?.file?.delete(); document=null; search=false; query=""; restoreUri=null;pdfTextMode=false }
         fun open(uri: Uri) {
             if(loading) return
             loading=true; error=null
@@ -91,9 +93,13 @@ class MainActivity: ComponentActivity() {
         MaterialTheme(colorScheme=colors) {
             Scaffold(containerColor=colors.background,topBar={
                 if(document!=null) TopAppBar(
-                    title={Column {Text(document?.name.orEmpty(),maxLines=1,overflow=TextOverflow.Ellipsis,fontSize=15.sp,fontWeight=FontWeight.SemiBold);Text("${document?.type?.uppercase()} document",fontSize=10.sp,color=colors.onSurfaceVariant)}},
+                    title={Column {Text(document?.name.orEmpty(),maxLines=1,overflow=TextOverflow.Ellipsis,fontSize=15.sp,fontWeight=FontWeight.SemiBold);Text(if(document?.type=="pdf") {if(pdfTextMode) "PDF · Text & search" else "PDF · Page view"} else "${document?.type?.uppercase()} document",fontSize=10.sp,color=colors.onSurfaceVariant)}},
                     navigationIcon={IconButton(onClick={close()}) {ReaderIcon("back","Back to library")}},
-                    actions={IconButton(onClick={search=!search;if(!search){query="";find("")}}) {ReaderIcon("search","Find in document")};IconButton(onClick={settings=true}) {ReaderIcon("settings","Settings")}},
+                    actions={
+                        if(document?.type=="pdf") TextButton(onClick={switchPdfMode(!pdfTextMode)}) {Text(if(pdfTextMode) "Page view" else "Text & search",fontSize=11.sp)}
+                        if(document?.type!="pdf"||pdfTextMode) IconButton(onClick={search=!search;if(!search){query="";find("")}}) {ReaderIcon("search","Find in document")}
+                        IconButton(onClick={settings=true}) {ReaderIcon("settings","Settings")}
+                    },
                     colors=TopAppBarDefaults.topAppBarColors(containerColor=colors.background))
             }) { padding ->
                 Column(Modifier.fillMaxSize().padding(padding)) {
@@ -105,6 +111,8 @@ class MainActivity: ComponentActivity() {
                     }
                     val current=document
                     if(current!=null) key(current.token) {
+                        if(current.type=="pdf"&&!pdfTextMode) NativePdfReader(current,onUseTextViewer={switchPdfMode(true)})
+                        else
                         AndroidView(factory={secureWebView(it,current,dark) {message ->close();error=message}.also {v->web=v}},
                             update={view->view.evaluateJavascript("document.documentElement.dataset.theme='${if(dark) "dark" else "light"}';document.querySelector('iframe')?.contentWindow.postMessage({appearance:'${if(dark) "dark" else "light"}'},'*');",null)},modifier=Modifier.fillMaxSize())
                     } else LibraryHome(recents,loading,onOpen=choose,onRecent={open(Uri.parse(it.uri))},onSettings={settings=true})
@@ -123,7 +131,7 @@ class MainActivity: ComponentActivity() {
                     HorizontalDivider(color=colors.outlineVariant)
                     TextButton(onClick={scope.launch {store.clear()}}) {ReaderIcon("trash",modifier=Modifier.size(18.dp));Spacer(Modifier.width(10.dp));Text("Clear recent documents")}
                     Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {ReaderIcon("shield",tint=colors.primary);Column {Text("Your files stay with you",fontSize=13.sp,fontWeight=FontWeight.Medium);Text("Offline. No accounts. No tracking.",fontSize=11.sp,color=colors.onSurfaceVariant)}}
-                    Text("Document Viewer 0.2.1 · 50 MB file limit\nPowerPoint preview is experimental.",fontSize=10.sp,lineHeight=16.sp,color=colors.onSurfaceVariant)
+                    Text("Document Viewer 0.3.0 · 50 MB file limit\nPDF page view uses Android rendering. Text & search uses the alternate reader.\nPowerPoint preview is experimental.",fontSize=10.sp,lineHeight=16.sp,color=colors.onSurfaceVariant)
                 }
             }
         }

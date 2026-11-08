@@ -4,7 +4,7 @@ System.getenv("DOCUMENT_VIEWER_BUILD_DIR")?.let { layout.buildDirectory.set(file
 android {
     namespace = "com.local.documentviewer"
     compileSdk = 34
-    defaultConfig { applicationId = "com.local.documentviewer"; minSdk = 28; targetSdk = 34; versionCode = 3; versionName = "0.2.1" }
+    defaultConfig { applicationId = "com.local.documentviewer"; minSdk = 28; targetSdk = 34; versionCode = 4; versionName = "0.3.0"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
     buildFeatures { compose = true }
     composeOptions { kotlinCompilerExtensionVersion = "1.5.14" }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
@@ -20,4 +20,6 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
     testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
 }
